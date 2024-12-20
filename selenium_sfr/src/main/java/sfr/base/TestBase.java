@@ -6,6 +6,8 @@ import java.time.Duration;
 import java.util.Properties;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+
 import io.github.bonigarcia.wdm.WebDriverManager;
 import sfr.utils.TestUtils;
 
@@ -26,26 +28,37 @@ public class TestBase {
         }
     }
     
-    // Method to initialize the WebDriver
-    public static void initialization() {
-        String browserName = prop.getProperty("browser");
-        
-        if (browserName.equalsIgnoreCase("chrome")) {
-            WebDriverManager.chromedriver().setup(); 
-            driver = new ChromeDriver();   
-        } else {
-          throw new RuntimeException("Browser not supported: " + browserName);
-        }
+	// Method to initialize the WebDriver
+		public static void initialization() {
+			String browserName = prop.getProperty("browser");
 
-        // Additional WebDriver settings
-        driver.manage().window().maximize();
-        driver.manage().deleteAllCookies(); 
-        
-        // Page load timeouts
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(TestUtils.PAGE_LOAD_TIMEOUT));
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(TestUtils.IMPLICIT_LOAD));
-        // Load the URL from properties file
-        driver.get(prop.getProperty("app_url"));    		
+			if (browserName.equalsIgnoreCase("chrome")) {
+				WebDriverManager.chromedriver().setup();
+				// Create ChromeOptions
+				ChromeOptions options = new ChromeOptions();
+
+				// Read ChromeOptions arguments from config.properties
+				String chromeOptionsFromConfig = prop.getProperty("chrome_options");
+				if (chromeOptionsFromConfig != null && !chromeOptionsFromConfig.isEmpty()) {
+					String[] optionsArray = chromeOptionsFromConfig.split(",");
+					options.addArguments(optionsArray); // Add arguments to ChromeOptions
+				}
+
+				driver = new ChromeDriver(options); // Pass options when creating ChromeDriver
+			} else {
+				throw new RuntimeException("Browser not supported: " + browserName);
+			}
+
+			// Additional WebDriver settings
+			driver.manage().window().maximize();
+			driver.manage().deleteAllCookies();
+
+			// Page load timeouts
+			driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(TestUtils.PAGE_LOAD_TIMEOUT));
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(TestUtils.IMPLICIT_LOAD));
+			// Load the URL from properties file
+			driver.get(prop.getProperty("app_url"));
+		}
+
 	}
 
-}
