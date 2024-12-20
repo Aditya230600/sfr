@@ -2,6 +2,6 @@ package sfr.pages;
 
 import sfr.base.TestBase;
 
-public class OBRQ_BU extends TestBase{
+public class RR_BU extends TestBase{
 
 }
